@@ -1,0 +1,74 @@
+version: "3.9"
+services:
+  # Application frontend cloud
+  frontcloud:
+    build:
+      context: netology-diplom-frontend
+      dockerfile: Dockerfile
+    container_name: frontcloud
+    image: cloud-storage-front:latest
+    ports:
+      - "8080:8080"
+
+
+  cloud-storage:
+    depends_on:
+      - mysql
+    container_name: appcloud
+    build: ./
+    image: cloudstorageapp:latest
+    restart: always
+    environment:
+#      spring_datasource_url: jdbc:mysql://localhost:3306/base
+#      MYSQL_HOST: mysql
+#      base?serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 4444
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+#      MYSQL_DB: todos
+    ports:
+      - "8090:8090"
+    expose:
+      - '8090'
+
+#  Liquibase:
+
+#    image: liquibase/liquibase:4.20.0
+
+#    container_name: Liquibase_container
+#
+
+#    depends_on:
+#      - mysql
+#    environment:
+#      MYSQL_DATABASE: 'base'
+#      MYSQL_ROOT_PASSWORD: '4444'
+
+
+#        network_mode: service_healthy
+  # Volume to add the liquibase collection of scripts
+#    volumes:
+#    - ./database/sql/liquibase/changeLog/:/liquibase/changelog/
+#  # Command to run the liquibase update service
+#    command: --defaults-file=/liquibase/changelog/liquibase.properties update
+
+
+
+  mysql:
+    container_name: mysql
+    image: mysql:8.0.31
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'base'
+#      MYSQL_USER: 'root'
+      MYSQL_ROOT_PASSWORD: '4444'
+#      MYSQL_DATABASE: todos
+
+    #      MYSQL_DATABASE: "base"
+    #      MYSQL_USER: "root"
+    #      MYSQL_PASSWORD: "4444"
+
+    ports:
+      - '330:3306'
+    expose:
+      - '3306'
