@@ -1,14 +1,16 @@
 version: "3.9"
 services:
-  # Application frontend cloud
+
   frontcloud:
     build:
-      context: netology-diplom-frontend
+      context: ./netology-diplom-frontend
       dockerfile: Dockerfile
     container_name: frontcloud
     image: cloud-storage-front:latest
     ports:
       - "8080:8080"
+    networks:
+      - storage-net
 
 
   cloud-storage:
@@ -19,39 +21,27 @@ services:
     image: cloudstorageapp:latest
     restart: always
     environment:
-#      spring_datasource_url: jdbc:mysql://localhost:3306/base
-#      MYSQL_HOST: mysql
-#      base?serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 4444
-      SPRING_JPA_HIBERNATE_DDL_AUTO: none
-#      MYSQL_DB: todos
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/base
     ports:
       - "8090:8090"
     expose:
       - '8090'
+    networks:
+      - storage-net
 
-#  Liquibase:
+  liquibase:
+    build:
+      context: ./
+      dockerfile: Dockerfile-liquibase
+    container_name: liquibase
+    depends_on:
+       - mysql
+    volumes:
+      - ./src/main/resources/db/changelog/changeset/:/liquibase/changelog/
 
-#    image: liquibase/liquibase:4.20.0
-
-#    container_name: Liquibase_container
-#
-
-#    depends_on:
-#      - mysql
-#    environment:
-#      MYSQL_DATABASE: 'base'
-#      MYSQL_ROOT_PASSWORD: '4444'
-
-
-#        network_mode: service_healthy
-  # Volume to add the liquibase collection of scripts
-#    volumes:
-#    - ./database/sql/liquibase/changeLog/:/liquibase/changelog/
-#  # Command to run the liquibase update service
-#    command: --defaults-file=/liquibase/changelog/liquibase.properties update
-
+    command: --url="jdbc:mysql://mysql:3306/base" --changelog-file=db.changelog-master-docker.xml --username=root --password=4444 update
+    networks:
+      - storage-net
 
 
   mysql:
@@ -60,15 +50,13 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: 'base'
-#      MYSQL_USER: 'root'
       MYSQL_ROOT_PASSWORD: '4444'
-#      MYSQL_DATABASE: todos
-
-    #      MYSQL_DATABASE: "base"
-    #      MYSQL_USER: "root"
-    #      MYSQL_PASSWORD: "4444"
-
     ports:
-      - '330:3306'
-    expose:
-      - '3306'
+      - '3308:3306'
+    networks:
+      - storage-net
+
+networks:
+  storage-net:
+    driver: bridge
+

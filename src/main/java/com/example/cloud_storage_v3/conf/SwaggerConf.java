@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@OpenAPIDefinition(info = @Info(title = "Storage Galaxy Cloud API",
+@OpenAPIDefinition(info = @Info(title = "Cloud storage",
         version = "v1.0",
         description = "Documentation APIs v1.0"))
 @SecurityScheme(name = "Bearer-token-auth",

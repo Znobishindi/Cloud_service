@@ -86,7 +86,6 @@ public class File extends BaseEntity {
                 ", fileName='" + fileName + '\'' +
                 ", type='" + type + '\'' +
                 ", size='" + size + '\'' +
-//                ", userId=" + user.getId() +
                 '}';
     }
 }
